@@ -1,0 +1,139 @@
+import json
+
+def main():
+    game = getDefaultGame()  
+    keepGoing = True
+
+    while keepGoing:
+        userChoice = getUserChoice()
+        if userChoice == "0":
+            print("Exiting the game.")
+            keepGoing = False
+        elif userChoice == "1":
+            game = getDefaultGame()  
+            print("Loaded default game.")
+        elif userChoice == "2":
+            saveGame(game)
+            print("Game saved successfully.")
+        elif userChoice == "3":
+            game = loadGame()
+            print("Game loaded from file.")
+        elif userChoice == "4":
+            game = editNode(game)
+        elif userChoice == "5":
+            playGame(game)
+        else:
+            print("Invalid choice. Please enter a number between 0 and 5.")
+
+def getUserChoice():
+    """Display menu options and get the user's choice."""
+    print("\nMenu:")
+    print("0) Exit")
+    print("1) Load default game")
+    print("2) Save current game")
+    print("3) Load game from file")
+    print("4) Edit or add a node")
+    print("5) Play the current game")
+    
+    return input("What will you do? ")
+
+def getDefaultGame():
+    """Create and return a default game structure."""
+    return {
+        "start": [
+            "default start node",
+            "Start over",  
+            "start",       
+            "Quit",        
+            "quit"         
+        ]
+    }
+
+def editNode(game):
+    """Edit or add a game node."""
+    print("Edit or add node")
+    print("\nCurrent status of game:\n")
+
+    for node_name, node_data in game.items():
+        print(f'"{node_name}": [')
+        for item in node_data:
+            print(f'    "{item}",')
+        print(']')
+
+    print()  
+    print("Existing node names:")
+    for node in game.keys():
+        print(node)
+
+    node_name = input("\nName of node to edit or create: ")
+    
+    if node_name in game:
+        print(f"Editing existing node: {node_name}")
+        node_data = game[node_name]
+    else:
+        node_data = ["", "", "", "", ""]  
+
+    node_data[0] = input(f"Description (default: {node_data[0]}): ") or node_data[0]
+    node_data[1] = editField("Menu A (Start over)", node_data[1])
+    node_data[2] = editField("Node A (start)", node_data[2])
+    node_data[3] = editField("Menu B (Quit)", node_data[3])
+    node_data[4] = editField("Node B (quit)", node_data[4])
+
+    game[node_name] = node_data
+    print(f"Node '{node_name}' updated successfully.")
+    return game
+
+def editField(field_name, current_value):
+    """Edit a field's current value."""
+    print(f"{field_name} (current: '{current_value}'): ", end="")
+    new_value = input()
+    return new_value if new_value else current_value  
+
+def saveGame(game):
+    """Save the game to a JSON file."""
+    with open('game.json', 'w') as file:
+        json.dump(game, file, indent=4)
+    print("Current game saved to 'game.json':")
+    print(json.dumps(game, indent=4))
+
+def loadGame():
+    """Load the game from a JSON file."""
+    try:
+        with open('game.json', 'r') as file:
+            game = json.load(file)
+            return game
+    except FileNotFoundError:
+        print("No saved game file found. Starting with an empty game.")
+        return {}
+
+def playGame(game):
+    """Play the current game."""
+    current_node = "start"
+    while current_node != "quit":
+        current_node = playNode(game, current_node)
+
+def playNode(game, node):
+    """Play a single game node."""
+    if node not in game:
+        print(f"Error: Node '{node}' does not exist.")
+        return "quit"
+
+    data = game[node]
+    print("\n" + data[0])  # Description
+    print("1) " + data[1])  # First choice
+    print("2) " + data[3])  # Second choice
+
+    while True:
+        try:
+            choice = int(input("Your choice: "))
+            if choice == 1:
+                return data[2]  
+            elif choice == 2:
+                return data[4]  
+            else:
+                print("Invalid choice. Please enter 1 or 2.")
+        except ValueError:
+            print("Please enter a valid number.")
+
+if __name__ == "__main__":
+    main()

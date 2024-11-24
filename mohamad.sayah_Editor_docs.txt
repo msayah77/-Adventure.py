@@ -1,0 +1,81 @@
+main()
+    game = getDefaultGame()
+    keepGoing = True
+
+    WHILE keepGoing:
+        userChoice = getMenuChoice()
+        IF userChoice is "0":
+            print "Exiting the game."
+            keepGoing = False
+        ELSE IF userChoice is "1":
+            game = getDefaultGame()
+        ELSE IF userChoice is "2":
+            saveGame(game)
+        ELSE IF userChoice is "3":
+            game = loadGame()
+        ELSE IF userChoice is "4":
+            game = editNode(game)
+        ELSE IF userChoice is "5":
+            playGame(game)
+        ELSE:
+            print "Invalid choice"
+
+getMenuChoice()
+    PRINT Menu options (0 to 5)
+    RETURN User input
+
+getDefaultGame()
+    RETURN Dictionary with a "start" node containing node data
+
+editNode(game)
+    PRINT all current nodes
+    PROMPT user for node to edit or create
+
+    IF node exists in game:
+        node_data = existing node data
+    ELSE:
+        node_data = new node with empty values
+
+    EDIT each field using `editField()`
+    UPDATE the game dictionary with edited node
+    RETURN updated game
+
+editField(field_name, current_value)
+    PRINT field_name and current_value
+    PROMPT user for new value
+    RETURN new value IF not empty, ELSE current_value
+
+saveGame(game)
+    OPEN 'game.json' for writing
+    DUMP game as JSON into the file
+    PRINT save confirmation
+
+loadGame()
+    TRY to open 'game.json' for reading
+    IF successful:
+        LOAD game from JSON
+        RETURN loaded game
+    ELSE:
+        PRINT error message and RETURN empty game
+
+playGame(game)
+    current_node = "start"
+
+    WHILE current_node is not "quit":
+        current_node = playNode(game, current_node)
+
+playNode(game, node)
+    IF node not in game:
+        PRINT error
+        RETURN "quit"
+
+    PRINT node description and options
+
+    PROMPT user for choice
+
+    IF choice is 1:
+        RETURN next node (data[2])
+    ELSE IF choice is 2:
+        RETURN next node (data[4])
+    ELSE:
+        PRINT invalid choice message
